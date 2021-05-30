@@ -1,3 +1,15 @@
+# -*- coding: utf-8 -*-
+
+"""
+==================================================
+   File Name：     a.py
+   email:         songdongdong@weidian.com
+   Author :       songdongdong
+   date：          2021/5/30 18:41
+   Description :
+==================================================
+"""
+
 # 配置参数
 class TrainingConfig(object):
     epoches = 10

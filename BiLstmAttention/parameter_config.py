@@ -1,4 +1,15 @@
-# Author:yifan
+# -*- coding: utf-8 -*-
+
+"""
+==================================================
+   File Name：     a.py
+   email:         songdongdong@weidian.com
+   Author :       songdongdong
+   date：          2021/5/30 18:41
+   Description :
+==================================================
+"""
+
 #需要的所有导入包，存放留用，转换到jupyter后直接使用
 # 1 配置训练参数
 class TrainingConfig(object):
