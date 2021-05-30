@@ -109,23 +109,27 @@ class BiLSTMAttention(object):
         # 对Bi-LSTM的输出用激活函数做非线性转换
         M = tf.tanh(H)
         
-        # 对W和M做矩阵运算，W=[batch_size, time_step, hidden_size]，计算前做维度转换成[batch_size * time_step, hidden_size]
-        # newM = [batch_size, time_step, 1]，每一个时间步的输出由向量转换成一个数字
-        newM = tf.matmul(tf.reshape(M, [-1, hiddenSize]), tf.reshape(W, [-1, 1]))
+        # 对W和M做矩阵运算，M=[batch_size, time_step, hidden_size]，计算前做维度转换成[batch_size * time_step, hidden_size]
+        # W=[hidden_size] 计算前转换成 [hidden_size,1]
+        # newM = [batch_size*time_step, 1]，每一个时间步的输出由向量转换成一个数字
+        newM = tf.matmul(tf.reshape(M, [-1, hiddenSize]), tf.reshape(W, [-1, 1])) # Q * K
         
-        # 对newM做维度转换成[batch_size, time_step]
+        # 对newM做维度转换成[batch_size, time_step] 这里的 sequenceLength ==time_step
         restoreM = tf.reshape(newM, [-1, config.sequenceLength])
         
         # 用softmax做归一化处理[batch_size, time_step]
-        self.alpha = tf.nn.softmax(restoreM)
+        self.alpha = tf.nn.softmax(restoreM) # softmax
         
         # 利用求得的alpha的值对H进行加权求和，用矩阵运算直接操作
-        r = tf.matmul(tf.transpose(H, [0, 2, 1]), tf.reshape(self.alpha, [-1, config.sequenceLength, 1]))
+        # H [batch_size,time_step,hidden_size] 计算前做维度转换成[batch_size ,hidden_size, time_step ]
+        #alpha [batch_size, time_step] 计算前做维度转换成[batch_size , time_step,1 ]
+        # 最终计算是：[batch_size,hidden_size,1]
+        r = tf.matmul(tf.transpose(H, [0, 2, 1]), tf.reshape(self.alpha, [-1, config.sequenceLength, 1])) # 这里乘以 Value
         
         # 将三维压缩成二维sequeezeR=[batch_size, hidden_size]
         sequeezeR = tf.reshape(r, [-1, hiddenSize])
-        
-        sentenceRepren = tf.tanh(sequeezeR)
+
+        sentenceRepren = tf.tanh(sequeezeR)#[batch_size, hidden_size]
         
         # 对Attention的输出可以做dropout处理
         output = tf.nn.dropout(sentenceRepren, self.dropoutKeepProb)
