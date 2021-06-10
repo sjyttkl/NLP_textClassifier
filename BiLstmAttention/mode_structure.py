@@ -66,7 +66,7 @@ class BiLSTMAttention(object):
 
             # 得到Attention的输出
             output = self.attention(H)
-            outputSize = config.model.hiddenSizes[-1]
+            outputSize = config.model.hiddenSizes[-1] # 这里是hidden_size
         
         # 全连接层的输出
         with tf.name_scope("output"):
@@ -95,10 +95,12 @@ class BiLSTMAttention(object):
                 losses = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.logits, labels=self.inputY)
                 
             self.loss = tf.reduce_mean(losses) + config.model.l2RegLambda * l2Loss
-    
+
     def attention(self, H):
         """
         利用Attention机制得到句子的向量表示
+        公式 ： sofmax(Q * K) * Q
+         tanh(softmax(tanh(Q)*K) *Q)
         """
         # 获得最后一层LSTM的神经元数量
         hiddenSize = config.model.hiddenSizes[-1]
